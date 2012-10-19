@@ -31,6 +31,39 @@ require File.expand_path(File.dirname(__FILE__) + '/edgecase')
 
 def score(dice)
   # You need to write this method
+  if dice.empty?
+    return 0
+  end
+  
+  # Create hash of dice value to count
+  counts = Hash.new
+  (1..6).map { |i| counts[i]=0 } # counts initialise to zero
+  
+  # Accumulate counts for each dice value
+  dice.each { |item|
+    counts[item] += 1
+  }
+  
+  # Scoring:
+  score = 0
+  counts.each{ |k,v| 
+    if v >= 3 # if a set of three or more
+      if k == 1
+        score += 1000 + (v>3 ? 100*(v-3) : 0) # 3*1s = 1000, 4*1s = 1100, 5*1s = 1200
+      else
+        score += k*100 + (v>3&&k==5 ? 50*(v-3) : 0) # 3*#s = 100*#, unless #=5, in which case add 50 for each extra
+      end
+    else # if not a set of three
+      if k == 1
+        score += 100*v
+      elsif k == 5
+        score += 50*v
+      end
+    end
+  }
+  
+  return score
+  
 end
 
 class AboutScoringProject < EdgeCase::Koan
