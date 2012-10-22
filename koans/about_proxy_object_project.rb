@@ -13,12 +13,35 @@ require File.expand_path(File.dirname(__FILE__) + '/edgecase')
 # of the Proxy class is given in the AboutProxyObjectProject koan.
 
 class Proxy
+  
   def initialize(target_object)
+    @log = Hash.new{0} # initialize empty keys to zero
     @object = target_object
-    # ADD MORE CODE HERE
   end
 
-  # WRITE CODE HERE
+  def method_missing(method_name, *args, &block)
+    # Log all calls.
+    @log[method_name] += 1 # Increment call counter.
+    
+    # Pass on valid function calls to the real object.
+    if @object.respond_to?(method_name)
+      @object.send(method_name, *args, &block)
+    else # Throw a NoMethodError.
+      raise NoMethodError, "Class '#{@object.class}' has no method '#{method_name}'"
+    end
+  end
+
+  def messages
+    @log.keys
+  end
+  
+  def called?(method_name)
+    @log.keys.member?(method_name)
+  end
+  
+  def number_of_times_called(method_name)
+    @log[method_name]
+  end
 end
 
 # The proxy object should pass the following Koan:
